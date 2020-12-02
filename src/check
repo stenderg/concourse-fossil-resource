@@ -42,7 +42,8 @@ config = json.loads(sys.stdin.read())
 uuid = main(config)
 
 if uuid is not None:
-    print(json.dumps([{ "ref": "%s" % uuid[0:10] }]))
+    #print(json.dumps([{ "ref": "%s" % uuid[0:10] }]))
+    print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
 else:
-    print("[]")
+    print(json.dumps({"version":{"ref": "none" },"metadata":[]}))
 exit(0)
