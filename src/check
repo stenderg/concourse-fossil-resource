@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+
+import json
+import subprocess
+import sys
+
+from shared import *
+
+sys.tracebacklimit = 0
+uuid = None
+
+config_schema = {
+    "source": {
+        "url": "",
+        "branch": ""
+    }
+}
+
+def main(config):
+    validate_schema(config, config_schema)
+    url = config["source"]["url"]
+    branch = config["source"]["branch"]
+    user = None
+    password = None
+
+    if "user" in config["source"]:
+        user = config["source"]["user"]
+
+    if "password" in config["source"]:
+        password = config["source"]["password"]
+
+    if user is not None and password is not None:
+        login(url, user, password)
+
+    return getTimeline(url, branch)
+
+
+config = json.loads(sys.stdin.read())
+
+uuid = main(config)
+
+output = [{ "ref": "%s" % uuid[0:10] }]
+print(json.dumps(output))
+exit(0)
