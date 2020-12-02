@@ -46,12 +46,12 @@ def login(url, user, password):
     return ret_value
 
 
-def getTimeline(url, tag):
+def getTimeline(url, tag, token):
     url_timeline = url + '/json/timeline/checkin'
     url_params = {'tag': tag}
     uuid = None
 
-    token = getAuthToken()
+    #token = getAuthToken()
     if token is not None:
         #pload = {"payload":{"authToken":token}}
         url_params['authToken'] = token 

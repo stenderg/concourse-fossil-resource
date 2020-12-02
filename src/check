@@ -22,6 +22,7 @@ def main(config):
     branch = config["source"]["branch"]
     user = None
     password = None
+    token = None
 
     if "user" in config["source"]:
         user = config["source"]["user"]
@@ -30,15 +31,19 @@ def main(config):
         password = config["source"]["password"]
 
     if user is not None and password is not None:
-        login(url, user, password)
+        login_data = login(url, user, password)
+        token = login_data['authToken']
 
-    return getTimeline(url, branch)
+    return getTimeline(url, branch, token)
 
 
 config = json.loads(sys.stdin.read())
 
 uuid = main(config)
 
-output = [{ "ref": "%s" % uuid[0:10] }]
+if uuid is not None:
+    output = [{ "ref": "%s" % uuid[0:10] }]
+else:
+    output = []
 print(json.dumps(output))
 exit(0)
