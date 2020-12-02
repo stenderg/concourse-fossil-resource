@@ -42,8 +42,7 @@ config = json.loads(sys.stdin.read())
 uuid = main(config)
 
 if uuid is not None:
-    output = [{ "ref": "%s" % uuid[0:10] }]
+    print(json.dumps([{ "ref": "%s" % uuid[0:10] }]))
 else:
-    output = []
-print(json.dumps(output))
+    print("[]")
 exit(0)
