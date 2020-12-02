@@ -17,6 +17,7 @@ config_schema = {
 }
 
 def main(config):
+    eprint(config)
     validate_schema(config, config_schema)
     url = config["source"]["url"]
     branch = config["source"]["branch"]
@@ -40,6 +41,7 @@ def main(config):
 config = json.loads(sys.stdin.read())
 
 uuid = main(config)
+eprint(uuid)
 
 if uuid is not None:
     #print(json.dumps([{ "ref": "%s" % uuid[0:10] }]))
