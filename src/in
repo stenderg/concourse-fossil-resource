@@ -46,7 +46,7 @@ def main(path, config):
     tarFilePath = getTarball(path, url, ref, cookies)
 
     os.system("tar -xf " + tarFilePath + " -C " + path)
-    os.system("rm " + tarFilePath)
+    #os.system("rm " + tarFilePath)
 
     return ref
 
