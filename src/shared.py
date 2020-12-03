@@ -141,8 +141,10 @@ def getTarball(path, url, uuid, cookies=None):
     #print(r.status_code)
 
     if r.status_code == 200:
-        file_to_write = os.path.join(path, uuid[0:10] + '.tar.gz')
+        file_to_write = os.path.join(path, 'fossil.tar.gz')
         toFileBinary(file_to_write, r.content)
+
+    return file_to_write
 
 
 def getAuthToken():

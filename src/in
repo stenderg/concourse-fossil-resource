@@ -43,7 +43,12 @@ def main(path, config):
 
     cookies = getCookieToken()
 
-    getTarball(path, url, ref, cookies)
+    tarFile = getTarball(path, url, ref, cookies)
+    print(tarFile)
+
+    #os.system("tar -xf " + tarFile + " && ls " + tarFile)
+    os.system("tar -xf " + tarFile)
+    #os.system("rm " + tarFile)
 
     return ref
 
