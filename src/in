@@ -45,9 +45,7 @@ def main(path, config):
 
     tarFilePath = getTarball(path, url, ref, cookies)
 
-    outputPath = os.path.join(path, 'fossil')
-    os.system("mkdir " + outputPath)
-    os.system("tar -xf " + tarFilePath + " -C " + outputPath)
+    os.system("tar -xf " + tarFilePath + " -C " + path)
     os.system("rm " + tarFilePath)
 
     return ref
