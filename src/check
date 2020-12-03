@@ -48,7 +48,8 @@ eprint(uuid)
 if uuid is not None:
     #print(json.dumps([{ "ref": "%s" % uuid[0:10] }]))
     #print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
-    print(json.dumps({"version":{"ref": "%s" % uuid[0:10] }}))
+    print(json.dumps([{"version":{"ref": "%s" % uuid[0:10] }}]))
 else:
-    print(json.dumps({"version":{"ref": "none" }}))
+    # empty version to keep Concourse happy
+    print('[]')
 exit(0)
