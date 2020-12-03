@@ -37,9 +37,9 @@ def main(path, config):
     # login erforderlich
     if user is not None and password is not None:
         pload = {"payload":{"name":user, "password":password}}
-        token = login(url, pload)
+        login(url, pload)
     else:
-        token = loginAnonym(url)
+        loginAnonym(url)
 
     cookies = getCookieToken()
 
