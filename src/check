@@ -32,8 +32,10 @@ def main(config):
         password = config["source"]["password"]
 
     if user is not None and password is not None:
-        login_data = login(url, user, password)
-        token = login_data['authToken']
+        pload = {"payload":{"name":user, "password":password}}
+        token = login(url, pload)
+    else:
+        token = loginAnonym(url)
 
     return getTimeline(url, branch, token)
 
@@ -45,7 +47,8 @@ eprint(uuid)
 
 if uuid is not None:
     #print(json.dumps([{ "ref": "%s" % uuid[0:10] }]))
-    print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
+    #print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
+    print(json.dumps({"version":{"ref": "%s" % uuid[0:10] }}))
 else:
-    print(json.dumps({"version":{"ref": "none" },"metadata":[]}))
+    print(json.dumps({"version":{"ref": "none" }}))
 exit(0)

@@ -9,9 +9,11 @@ import json
 from urllib.parse import urljoin
 
 AUTH_TOKEN_FILE = "token"
+AUTH_TOKEN_FILE_COOKIE = "cookie"
 
 def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+    #print(*args, file=sys.stderr, **kwargs)
+    pass
 
 def validate_schema(target, schema, prefix=""):
     for (key, value) in schema.items():
@@ -25,25 +27,80 @@ def validate_schema(target, schema, prefix=""):
             validate_schema(target[key], schema[key], "%s." % key)
 
 
-def login(url, user, password):
+def login(url, postData):
+    if checkLogin(url):
+        return getAuthToken()
+
     url_login = url + "/json/login"
-    pload = {"payload":{"name":user, "password":password}}
+    #pload = {"payload":{"name":user, "password":password}}
+    #pload = {"payload":{"name":"anonymous", "anonymousSeed":str(user)+password, "password":password}}
+    #eprint(pload)
     headers = {'content-type': 'application/json'}
 
-    ret_value = None
+    token = None
 
-    r = requests.post(url_login, data=json.dumps(pload), headers=headers)
+    r = requests.post(url_login, data=json.dumps(postData), headers=headers)
     #print(r.text)
     #print(r.status_code)
 
     if r.status_code == 200:
         resp_dict = r.json()
-        toFile(AUTH_TOKEN_FILE, resp_dict['payload']['authToken'])
-        ret_value = resp_dict['payload']
-    else:
-        print("Login return HHTP-Status: " + r.status_code)
+        eprint(resp_dict)
+        if 'payload' in resp_dict:
+            token = resp_dict['payload']['authToken']
+            toFile(AUTH_TOKEN_FILE, token)
 
-    return ret_value
+            cookie = {resp_dict['payload']['loginCookieName']:resp_dict['payload']['authToken']}
+            toFile(AUTH_TOKEN_FILE_COOKIE, json.dumps(cookie))
+        else:
+            delAuthTokens()
+
+    else:
+        delAuthTokens()
+        print("Login return HTTP-Status: " + r.status_code)
+
+    return token
+
+def loginAnonym(url):
+    if checkLogin(url):
+        return getAuthToken()
+
+    url_login = url + "/json/anonymousPassword"
+    headers = {'content-type': 'application/json'}
+
+    token = None
+
+    r = requests.post(url_login, headers=headers)
+    eprint(r.text)
+    #print(r.status_code)
+
+    if r.status_code == 200:
+        resp_dict = r.json()
+        seed = resp_dict['payload']['seed']
+        password = resp_dict['payload']['password']
+        pload = {"payload":{"name":"anonymous", "anonymousSeed":str(seed)+password, "password":password}}
+        token = login(url, pload)
+    else:
+        print("Login return HTTP-Status: " + r.status_code)
+
+    return token
+
+def checkLogin(url):
+    url_whoami = url + "/json/whoami"
+    headers = {'content-type': 'application/json'}
+    pload = {"payload":{"name":"nobody", "capabilities":"o", "authToken":getAuthToken()}}
+
+    r = requests.post(url_whoami, data=json.dumps(pload), headers=headers)
+    eprint(r.text)
+
+    if r.status_code == 200:
+        resp_dict = r.json()
+        if 'payload' in resp_dict:
+            if resp_dict['payload']['authToken'] != None:
+                return True
+
+    delAuthTokens()
+    return False
 
 
 def getTimeline(url, tag, token):
@@ -66,6 +123,9 @@ def getTimeline(url, tag, token):
             #eprint(resp_dict['payload']['timeline'][0]['uuid'])
             uuid = resp_dict['payload']['timeline'][0]['uuid']
         
+    if uuid is None:
+        delAuthTokens()
+
     return uuid
 
 
@@ -73,6 +133,8 @@ def getTarball(path, url, uuid, cookies=None):
     url_tarball = url + '/tarball/' + uuid
     url_params = {}
     auth_params = {}
+
+    eprint(cookies)
 
     r = requests.get(url_tarball, params=url_params, auth=auth_params, cookies=cookies)
     #print(r.text)
@@ -89,11 +151,26 @@ def getAuthToken():
         with open(AUTH_TOKEN_FILE, 'r') as f:
             token = f.read()
             f.close()
-            return token
     except IOError:
         pass
     return token
 
+def getCookieToken():
+    jsonData = None
+    try:
+        with open(AUTH_TOKEN_FILE_COOKIE, 'r') as f:
+            jsonData = json.load(f)
+            f.close()
+    except IOError:
+        pass
+    return jsonData
+
+def delAuthTokens():
+    ## If file exists, delete it ##
+    if os.path.isfile(AUTH_TOKEN_FILE):
+        os.remove(AUTH_TOKEN_FILE)
+    if os.path.isfile(AUTH_TOKEN_FILE_COOKIE):
+        os.remove(AUTH_TOKEN_FILE_COOKIE)
 
 def toFile(filename, content):
     with open(filename, 'w') as f:
