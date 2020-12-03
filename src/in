@@ -43,11 +43,12 @@ def main(path, config):
 
     cookies = getCookieToken()
 
-    tarFile = getTarball(path, url, ref, cookies)
+    tarFilePath = getTarball(path, url, ref, cookies)
 
-    os.system("mkdir fossil")
-    os.system("tar -xf " + tarFile + " -C fossil")
-    os.system("rm " + tarFile)
+    outputPath = os.path.join(path, 'fossil')
+    os.system("mkdir " + outputPath)
+    os.system("tar -xf " + tarFilePath + " -C " + outputPath)
+    os.system("rm " + tarFilePath)
 
     return ref
 
