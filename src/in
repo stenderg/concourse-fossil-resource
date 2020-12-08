@@ -37,16 +37,18 @@ def main(path, config):
     # login erforderlich
     if user is not None and password is not None:
         pload = {"payload":{"name":user, "password":password}}
-        login(url, pload)
+        if login(url, pload) is None:
+            return None
     else:
         loginAnonym(url)
 
-    cookies = getCookieToken()
-
-    tarFilePath = getTarball(path, url, ref, cookies)
+    # get tarball with cookie data
+    tarFilePath = getTarball(path, url, ref, getCookieToken())
+    if tarFilePath is None:
+        return None
 
     os.system("tar -xf " + tarFilePath + " -C " + path)
-    #os.system("rm " + tarFilePath)
+    os.system("rm " + tarFilePath)
 
     return ref
 
@@ -55,6 +57,10 @@ path = sys.argv[1]
 config = json.loads(sys.stdin.read())
 
 uuid = main(path, config)
+if uuid is None:
+    # delete token and next try to login
+    delAuthTokens()
+    uuid = main(path, config)
 
 print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
 exit(0)

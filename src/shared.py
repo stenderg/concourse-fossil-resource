@@ -80,6 +80,10 @@ def loginAnonym(url):
         password = resp_dict['payload']['password']
         pload = {"payload":{"name":"anonymous", "anonymousSeed":str(seed)+password, "password":password}}
         token = login(url, pload)
+
+        # second try...
+        if token is None:
+            token = login(url, pload)
     else:
         print("Login return HTTP-Status: " + r.status_code)
 
@@ -96,9 +100,10 @@ def checkLogin(url):
     if r.status_code == 200:
         resp_dict = r.json()
         if 'payload' in resp_dict:
-            if resp_dict['payload']['authToken'] != None:
+            eprint(resp_dict['payload']['authToken'])
+            if resp_dict['payload']['authToken'] != None and resp_dict['payload']['authToken'] != 'null':
                 return True
-
+    
     delAuthTokens()
     return False
 
@@ -131,16 +136,17 @@ def getTimeline(url, tag, token):
 
 def getTarball(path, url, uuid, cookies=None):
     url_tarball = url + '/tarball/' + uuid
+    file_to_write = None
     url_params = {}
     auth_params = {}
 
     eprint(cookies)
 
     r = requests.get(url_tarball, params=url_params, auth=auth_params, cookies=cookies)
-    #print(r.text)
-    #print(r.status_code)
+    #print(r.headers['Content-Type'])
+    eprint(r.headers)
 
-    if r.status_code == 200:
+    if r.status_code == 200 and 'application' in r.headers['Content-Type'] :
         file_to_write = os.path.join(path, 'fossil.tar.gz')
         toFileBinary(file_to_write, r.content)
 
