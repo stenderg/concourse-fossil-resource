@@ -18,8 +18,6 @@ config_schema = {
 }
 
 def main(path, config):
-    cookies = None
-
     validate_schema(config, config_schema)
     
     url = config["source"]["url"]
@@ -62,5 +60,9 @@ if uuid is None:
     delAuthTokens()
     uuid = main(path, config)
 
-print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
+if uuid is not None:
+    print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
+else:
+    # empty version to keep Concourse happy
+    print('[]')
 exit(0)
