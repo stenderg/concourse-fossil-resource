@@ -45,6 +45,7 @@ def main(path, config):
     if tarFilePath is None:
         return None
 
+    # unpack and delete tar source
     os.system("tar -xf " + tarFilePath + " -C " + path)
     os.system("rm " + tarFilePath)
 

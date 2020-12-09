@@ -12,7 +12,7 @@ AUTH_TOKEN_FILE = "token"
 AUTH_TOKEN_FILE_COOKIE = "cookie"
 
 def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+    #print(*args, file=sys.stderr, **kwargs)
     pass
 
 def validate_schema(target, schema, prefix=""):
