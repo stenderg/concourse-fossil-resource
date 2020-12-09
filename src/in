@@ -53,6 +53,7 @@ def main(path, config):
 
 path = sys.argv[1]
 config = json.loads(sys.stdin.read())
+eprint(config)
 
 uuid = main(path, config)
 if uuid is None:
