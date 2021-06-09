@@ -57,7 +57,7 @@ def login(url, postData):
 
     else:
         delAuthTokens()
-        print("Login return HTTP-Status: " + r.status_code)
+        print("Login return HTTP-Status: " + str(r.status_code))
 
     return token
 
@@ -85,7 +85,7 @@ def loginAnonym(url):
         if token is None:
             token = login(url, pload)
     else:
-        print("Login return HTTP-Status: " + r.status_code)
+        print("Login return HTTP-Status: " + str(r.status_code))
 
     return token
 
@@ -111,6 +111,7 @@ def checkLogin(url):
 def getTimeline(url, tag, token):
     url_timeline = url + '/json/timeline/checkin'
     url_params = {'tag': tag}
+    
     uuid = None
 
     #token = getAuthToken()
@@ -119,19 +120,21 @@ def getTimeline(url, tag, token):
         url_params['authToken'] = token 
 
     r = requests.get(url_timeline, params=url_params)
+    #print("request.txt" + r.text)
 
     if r.status_code == 200:
         resp_dict = r.json()
 
-        #eprint(resp_dict.keys())
+        eprint(resp_dict.keys())
         if 'payload' in resp_dict:
-            #eprint(resp_dict['payload']['timeline'][0]['uuid'])
+            eprint(resp_dict['payload']['timeline'][0])
             uuid = resp_dict['payload']['timeline'][0]['uuid']
         
     if uuid is None:
         delAuthTokens()
-
-    return uuid
+        return None;
+    else:
+        return resp_dict['payload']['timeline'][0];
 
 
 def getTarball(path, url, uuid, cookies=None):

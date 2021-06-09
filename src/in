@@ -24,6 +24,7 @@ def main(path, config):
     branch = config["source"]["branch"]
     user = None
     password = None
+    token = None
     ref = config["version"]["ref"]
 
     if "user" in config["source"]:
@@ -35,10 +36,11 @@ def main(path, config):
     # login erforderlich
     if user is not None and password is not None:
         pload = {"payload":{"name":user, "password":password}}
-        if login(url, pload) is None:
+        token = login(url, pload)
+        if token is None:
             return None
     else:
-        loginAnonym(url)
+        token = loginAnonym(url)
 
     # get tarball with cookie data
     tarFilePath = getTarball(path, url, ref, getCookieToken())
@@ -48,6 +50,12 @@ def main(path, config):
     # unpack and delete tar source
     os.system("tar -xf " + tarFilePath + " -C " + path)
     os.system("rm " + tarFilePath)
+
+    # write timelineItem as File
+    timelineItem = getTimeline(url, branch, token)
+    eprint(timelineItem)
+    with open("timelineItem.json", "w") as timeline_data_file:
+        json.dump(timelineItem, timeline_data_file, indent=4, sort_keys=True)
 
     return ref
 

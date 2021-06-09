@@ -42,10 +42,11 @@ def main(config):
 
 config = json.loads(sys.stdin.read())
 
-uuid = main(config)
-eprint(uuid)
+timelineItem = main(config)
+if timelineItem is not None:
+    uuid = timelineItem['uuid']
+    eprint(uuid)
 
-if uuid is not None:
     print(json.dumps([{ "ref": "%s" % uuid[0:10] }]))
     #print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
     #print(json.dumps([{"version":{"ref": "%s" % uuid[0:10] }}]))
