@@ -57,21 +57,21 @@ def main(path, config):
     with open("timelineItem.json", "w") as timeline_data_file:
         json.dump(timelineItem, timeline_data_file, indent=4, sort_keys=True)
 
-    return ref
+    return timelineItem
 
 
 path = sys.argv[1]
 config = json.loads(sys.stdin.read())
 eprint(config)
 
-uuid = main(path, config)
-if uuid is None:
+timelineItem = main(path, config)
+if timelineItem is None:
     # delete token and next try to login
     delAuthTokens()
-    uuid = main(path, config)
+    timelineItem = main(path, config)
 
-if uuid is not None:
-    print(json.dumps({"version":{"ref": "%s" % uuid[0:10] },"metadata":[]}))
+if timelineItem is not None:
+    print(json.dumps({"version":{"ref": "%s" % timelineItem['uuid'][0:10] },"metadata":[timelineItem]}))
 else:
     # empty version to keep Concourse happy
     print('[]')
